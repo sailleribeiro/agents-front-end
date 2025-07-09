@@ -1,39 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
-
-type GetRoomsResponse = Array<{
-  id: string;
-  name: string;
-  createdAt: string;
-}>;
+import { CreateRoomForm } from "@/components/create-room-form";
+import { RoomList } from "@/components/room-list";
 
 export function CreateRoom() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["get-rooms"],
-    queryFn: async () => {
-      const response = await fetch("http://localhost:3333/rooms");
-      const result: GetRoomsResponse = await response.json();
-      return result;
-    },
-  });
-
   return (
-    <>
-      <div>Create Room</div>
-
-      {isLoading && <p>Loading...</p>}
-
-      {data && (
-        <ul>
-          {data.map((room) => (
-            <li key={room.id}>
-              <Link to={`/room/${room.id}`} className="underline">
-                Go to {room.name}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-    </>
+    <div className="min-h-screen py-8 p-4">
+      <div className="mx-auto max-w-4xl">
+        <div className="grid grid-cols-2 items-start gap-8">
+          <CreateRoomForm />
+          <RoomList />
+        </div>
+      </div>
+    </div>
   );
 }
