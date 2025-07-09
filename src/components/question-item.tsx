@@ -1,6 +1,6 @@
 import { Bot, Loader2, MessageSquare } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { formatRelativeDate } from "@/utils/formate-relative-date";
+import { formatRelativeDate } from "@/utils/format-relative-date";
 
 interface Question {
   id: string;

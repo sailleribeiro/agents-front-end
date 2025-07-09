@@ -8,7 +8,7 @@ import {
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { formatRelativeDate } from "@/utils/formate-relative-date";
+import { formatRelativeDate } from "@/utils/format-relative-date";
 import { useRooms } from "@/http/user-rooms";
 
 export function RoomList() {
