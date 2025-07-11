@@ -22,7 +22,7 @@ export function RecordRoomAudio() {
       recordRef.current.stop();
     }
 
-    toast("Recording stopped. You can now process the audio.", {
+    toast("Recording has been paused", {
       icon: "✅",
     });
   }
