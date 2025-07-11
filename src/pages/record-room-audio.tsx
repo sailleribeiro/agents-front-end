@@ -16,6 +16,7 @@ export function RecordRoomAudio() {
   const params = useParams<RoomParams>();
   const [isRecording, setIsRecording] = useState(false);
   const recordRef = useRef<MediaRecorder | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   async function stopRecording() {
     if (recordRef.current && recordRef.current.state === "recording") {
@@ -25,6 +26,10 @@ export function RecordRoomAudio() {
     toast("Recording has been paused", {
       icon: "✅",
     });
+
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
   }
 
   async function uploadAudio(audio: Blob) {
@@ -43,35 +48,14 @@ export function RecordRoomAudio() {
     console.log("Audio uploaded:", result);
   }
 
-  async function startRecording() {
-    if (!isRecordingSupported) {
-      toast("Recording is not supported in this browser.", {
-        icon: "🚫",
-      });
-      return;
-    }
-
-    setIsRecording(true);
-
-    const audio = navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        sampleRate: 44100,
-      },
-    });
-
-    recordRef.current = new MediaRecorder(await audio, {
+  function createRecorder(audio: MediaStream) {
+    recordRef.current = new MediaRecorder(audio, {
       mimeType: "audio/webm",
       audioBitsPerSecond: 128000,
     });
 
     recordRef.current.ondataavailable = (event) => {
       if (event.data.size > 0) {
-        // const audioBlob = new Blob([event.data], { type: "audio/webm" });
-        // const audioUrl = URL.createObjectURL(audioBlob);
-        // const audioElement = new Audio(audioUrl);
-        // audioElement.play();
         uploadAudio(event.data);
       }
       setIsRecording(false);
@@ -86,6 +70,33 @@ export function RecordRoomAudio() {
     };
 
     recordRef.current.start();
+  }
+
+  async function startRecording() {
+    if (!isRecordingSupported) {
+      toast("Recording is not supported in this browser.", {
+        icon: "🚫",
+      });
+      return;
+    }
+
+    setIsRecording(true);
+
+    const audio = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        sampleRate: 44100,
+      },
+    });
+
+    createRecorder(audio);
+
+    intervalRef.current = setInterval(() => {
+      recordRef.current?.stop();
+      createRecorder(audio);
+    }, 5000);
+
     toast("Recording started. Speak now!", {
       icon: "🎤",
     });
